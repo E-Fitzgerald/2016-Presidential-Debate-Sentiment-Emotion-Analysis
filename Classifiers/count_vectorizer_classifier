@@ -1,0 +1,65 @@
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import GaussianNB
+from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.linear_model import RidgeClassifier
+from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.linear_model import Perceptron
+
+def vectorize_training_count(training_tweets, test_tweets):
+    vectorizer = CountVectorizer(min_df=5,
+                                 max_df=0.8)
+    train_vectors = vectorizer.fit_transform(training_tweets["Tweet"])
+    test_vectors = vectorizer.transform(test_tweets["Tweet"])
+
+    return train_vectors, test_vectors
+
+def get_classifier_count_LinearSVC(transformed_training, sentiments):
+    classifier_liblinear = svm.LinearSVC()
+    classifier_liblinear.fit(transformed_training, sentiments)
+
+    return classifier_liblinear
+
+def get_classifier_count_GaussianNB(transformed_training, sentiments):
+    gnb = GaussianNB()
+    y_pred = gnb.fit(transformed_training.toarray(), sentiments)
+
+    return y_pred
+
+def get_classifier_count_RandomForest(transformed_training, sentiments):
+    randForest = RandomForestClassifier(n_estimators=50, min_samples_split=3)
+    y_pred = randForest.fit(transformed_training, sentiments)
+
+    return y_pred
+
+def get_classifier_count_DecisionTree(transformed_training, sentiments):
+    decTree = DecisionTreeClassifier(min_samples_split=3)
+    y_pred = decTree.fit(transformed_training, sentiments)
+
+    return y_pred
+
+def get_classifier_count_AdaBoostClassifier(transformed_training, sentiments):
+    abc = AdaBoostClassifier(base_estimator=RandomForestClassifier())
+    y_pred = abc.fit(transformed_training, sentiments)
+
+    return y_pred
+
+def get_classifier_count_RidgeClassifier(transformed_training, sentiments):
+    rc = RidgeClassifier()
+    y_pred = rc.fit(transformed_training, sentiments)
+
+    return y_pred
+
+def get_classifier_count_PassiveAggressiveClassifier(transformed_training, sentiments):
+    pac = PassiveAggressiveClassifier()
+    y_pred = pac.fit(transformed_training, sentiments)
+
+    return y_pred
+
+def get_classifier_count_Perceptron(transformed_training, sentiments):
+    per = Perceptron(penalty="l2")
+    y_pred = per.fit(transformed_training, sentiments)
+
+    return y_pred
