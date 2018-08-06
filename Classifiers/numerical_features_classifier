@@ -1,0 +1,178 @@
+import nltk.sentiment
+from sklearn.naive_bayes import GaussianNB
+from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.linear_model import RidgeClassifier
+from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.linear_model import Perceptron
+
+def getFeatureVector(tweet, pos_words, neg_words):
+    #number of positive words from Bing Liu's Opinion Lexicon
+    featureVector = []
+    count_neg = 0
+    count_pos = 0
+    for word in (nltk.word_tokenize(tweet)):
+        if (word in pos_words):
+            count_pos += 1
+        if (word in neg_words):
+            count_neg += 1
+    featureVector.append(count_pos)
+    featureVector.append(count_neg)
+
+    #number of characters
+    num_chars = len(tweet)
+    featureVector.append(num_chars)
+
+    #number of uppercase characters
+    count = 0
+    for word in (nltk.word_tokenize(tweet)):
+        for letter in word:
+            if (letter.isupper()):
+                count += 1
+    featureVector.append(count)
+
+    #average word length
+    length = avg_word(tweet)
+    featureVector.append(length)
+
+    #number of words
+    num_words = str(tweet).split(" ")
+    featureVector.append(len(num_words))
+
+    #number of uppercase words
+    count = 0
+    for word in (nltk.word_tokenize(tweet)):
+        if (word[0].isupper()):
+            if (word == "ATUSER"):
+                count = count
+            else:
+                count += 1
+    featureVector.append(count)
+
+    #difference between the number of positive and negative words from Bing Liu's Opinion Lexicon
+    count_neg = 0
+    count_pos = 0
+    for word in (nltk.word_tokenize(tweet)):
+        if (word in pos_words):
+            count_pos += 1
+        if (word in neg_words):
+            count_neg += 1
+    difference = count_pos - count_neg
+    featureVector.append(difference)
+
+    #ratio between the number of negative and positive words from Bing Liu's Opinion Lexicon
+    count_neg = 0
+    count_pos = 0
+    for word in (nltk.word_tokenize(tweet)):
+        if (word in pos_words):
+            count_pos += 1
+        if (word in neg_words):
+            count_neg += 1
+    if (count_pos == 0):
+        count_pos = 1
+    ratio = count_neg / count_pos
+    featureVector.append(ratio)
+
+    return featureVector
+
+def avg_word(sentence):
+  words = sentence.split()
+  return (sum(len(word) for word in words)/len(words))
+
+def get_classifier_numerical_LinearSVC(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    classifier_liblinear = svm.LinearSVC()
+    classifier_liblinear.fit(featureList, sentiments)
+
+    return classifier_liblinear
+
+def get_classifier_numerical_GaussianNB(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    gnb = GaussianNB()
+    y_pred = gnb.fit(featureList, sentiments)
+
+    return y_pred
+
+def get_classifier_numerical_RandomForest(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    randForest = RandomForestClassifier(n_estimators=50, min_samples_split=3)
+    y_pred = randForest.fit(featureList, sentiments)
+
+    return y_pred
+
+def get_classifier_numerical_DecisionTree(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    decTree = DecisionTreeClassifier(min_samples_split=3)
+    y_pred = decTree.fit(featureList, sentiments)
+
+    return y_pred
+
+def get_classifier_numerical_AdaBoostClassifier(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    abc = AdaBoostClassifier(base_estimator=RandomForestClassifier())
+    y_pred = abc.fit(featureList, sentiments)
+
+    return y_pred
+
+def get_classifier_numerical_RidgeClassifier(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    rc = RidgeClassifier()
+    y_pred = rc.fit(featureList, sentiments)
+
+    return y_pred
+
+def get_classifier_numerical_PassiveAggressiveClassifier(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    pac = PassiveAggressiveClassifier()
+    y_pred = pac.fit(featureList, sentiments)
+
+    return y_pred
+
+def get_classifier_numerical_Perceptron(training_tweets, sentiments, pos_words, neg_words):
+    featureList = []
+
+    for k in range(0, len(training_tweets["Tweet"]), 1):
+        featureVector = getFeatureVector(training_tweets["Tweet"][k], pos_words, neg_words)
+        featureList.append(featureVector)
+
+    per = Perceptron(penalty="l2")
+    y_pred = per.fit(featureList, sentiments)
+
+    return y_pred
