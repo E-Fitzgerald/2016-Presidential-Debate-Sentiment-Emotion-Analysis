@@ -1,0 +1,10 @@
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+def get_Vader_Classifications(tweets):
+    predictions = []
+    analyzer = SentimentIntensityAnalyzer()
+    for tweet in tweets:
+        vs = analyzer.polarity_scores(tweet)
+        predictions.append(round(vs["compound"] * 3))
+
+    return predictions
